@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.scut</groupId>
-	<artifactId>turing</artifactId>
+	<artifactId>turing-producer</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>DBSyn</name>
 	<description>project for database synchronization</description>
