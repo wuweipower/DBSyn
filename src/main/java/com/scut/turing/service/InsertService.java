@@ -1,9 +1,10 @@
 package com.scut.turing.service;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 
 public class InsertService {
-    public static String dataConvert(Object value)
+    public  String dataConvert(Object value)
     {
         String res;
         if(value==null) res = "NULL";
@@ -14,14 +15,13 @@ public class InsertService {
         return res;
     }
 
-    public static String insertHandler(String tableName, Object[] row)
+    public  StringBuilder insertHandler(String tableName, Object[] row)
     {
         StringBuilder builder = new StringBuilder();
         builder.append("insert into ");
         builder.append(tableName);
-        builder.append( " values (");
 
-        //String sql = "insert into "+tableName+" VALUES (";
+        builder.append( " values (");
         for(int i =0;i<row.length;i++)
         {
             Object value = row[i];
@@ -33,6 +33,6 @@ public class InsertService {
         }
         builder.append(")");
 
-        return builder.toString();
+        return builder;
     }
 }

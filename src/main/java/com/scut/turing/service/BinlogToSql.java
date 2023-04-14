@@ -62,7 +62,7 @@ public class BinlogToSql implements ApplicationRunner {
 
         client.registerEventListener(event -> {
             EventData data = event.getData();
-            String sql="";//存储要发送的sql
+            StringBuilder sql = null;//存储要发送的sql
 
             //存tableId和对应的名字
             if(data instanceof TableMapEventData)
@@ -81,9 +81,10 @@ public class BinlogToSql implements ApplicationRunner {
             {
                 WriteRowsEventData eventData = (WriteRowsEventData) data;
                 String table = tableMap.get(eventData.getTableId());
+
                 for(Object[] row : eventData.getRows())
                 {
-
+                    sql= insertService.insertHandler(table, row);
                 }
             }
             else if(data instanceof UpdateRowsEventData)
@@ -93,18 +94,19 @@ public class BinlogToSql implements ApplicationRunner {
                 List<Map.Entry<Serializable[], Serializable[]>> rows = eventData.getRows();
                 for(Map.Entry<Serializable[], Serializable[]> row : rows )
                 {
-                    Serializable[] key = row.getKey();
-                    Serializable[] value = row.getValue();
+                    sql= updateService.updateHandler(table, row);
                 }
             }
             else if (data instanceof DeleteRowsEventData) {
                 DeleteRowsEventData eventData = (DeleteRowsEventData) data;
                 String table = tableMap.get(eventData.getTableId());
                 List<Serializable[]> rows = eventData.getRows();
+                for (Serializable[] row:rows) {
 
+                }
             }
             //最后发送出去
-            sendSqlService.sendSql(sql);
+            sendSqlService.sendSql(sql.toString());
         });
         try {
             client.connect();

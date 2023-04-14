@@ -12,7 +12,7 @@ public class SendSqlService {
     private RabbitTemplate rabbitTemplate;
 
     //1.定义交换机
-    private String exchangeName = "exchange_sql";
+    private String exchangeName = "sql_exchange";
     //2.路由key
     private String routeKey = "sql";
 

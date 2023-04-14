@@ -20,7 +20,7 @@ public class DirectRabbitConfig {
     @Bean
     public DirectExchange directSqlExchange()
     {
-        return new DirectExchange("exchange_sql");
+        return new DirectExchange("sql_exchange");
     }
 
     @Bean

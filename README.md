@@ -44,3 +44,8 @@ git pull --rebase origin main
 再
 
 push
+
+
+
+要使用Java监听binlog的更新事件并生成对应的SQL语句，可以使用开源的binlog监听库，如canal或者debezium。
+

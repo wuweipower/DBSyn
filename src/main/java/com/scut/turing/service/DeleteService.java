@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 public class DeleteService {
 
-    public static String deleteHandler(String tableName, Serializable[] row){
+    public static String deleteHandler(String tableName, Serializable[] keys,Serializable[] values){
 
         StringBuilder builder = new StringBuilder();
         builder.append("delete from ");
