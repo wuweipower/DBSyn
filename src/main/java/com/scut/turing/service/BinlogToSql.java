@@ -2,6 +2,7 @@ package com.scut.turing.service;
 
 import com.github.shyiko.mysql.binlog.BinaryLogClient;
 import com.github.shyiko.mysql.binlog.event.*;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.BitSet;
 import java.util.List;
 import java.util.Map;
 
@@ -80,31 +82,36 @@ public class BinlogToSql implements ApplicationRunner {
             if (data instanceof WriteRowsEventData)
             {
                 WriteRowsEventData eventData = (WriteRowsEventData) data;
+
                 String table = tableMap.get(eventData.getTableId());
 
-                for(Object[] row : eventData.getRows())
-                {
-                    sql= insertService.insertHandler(table, row);
-                }
+//                for(Object[] row : eventData.getRows())
+//                {
+//                    sql= insertService.insertHandler(table, row);
+//                }
             }
             else if(data instanceof UpdateRowsEventData)
             {
                 UpdateRowsEventData eventData = (UpdateRowsEventData) data;
                 String table = tableMap.get(eventData.getTableId());
+                BitSet includedColumns = eventData.getIncludedColumns();
+                BitSet includedColumnsBeforeUpdate = eventData.getIncludedColumnsBeforeUpdate();
                 List<Map.Entry<Serializable[], Serializable[]>> rows = eventData.getRows();
-                for(Map.Entry<Serializable[], Serializable[]> row : rows )
-                {
-                    sql= updateService.updateHandler(table, row);
-                }
+//                for(Map.Entry<Serializable[], Serializable[]> row : rows )
+//                {
+//                    sql= updateService.updateHandler(table, row);
+//                }
             }
             else if (data instanceof DeleteRowsEventData) {
                 DeleteRowsEventData eventData = (DeleteRowsEventData) data;
                 String table = tableMap.get(eventData.getTableId());
-                List<Serializable[]> rows = eventData.getRows();
-                for (Serializable[] row:rows) {
 
-                }
+                List<Serializable[]> rows = eventData.getRows();
+//                for (Serializable[] row:rows) {
+//
+//                }
             }
+
             //最后发送出去
             sendSqlService.sendSql(sql.toString());
         });
