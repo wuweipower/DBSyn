@@ -1,0 +1,15 @@
+spring:
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: 123456
+  rabbitmq:
+    username: admin
+    password: admin
+    virtual-host: /
+    host: 47.104.141.27
+    port: 5672
+
+server:
+  port: 8081
