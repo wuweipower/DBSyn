@@ -1,10 +1,11 @@
 package com.scut.turing.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
 import java.util.Map;
-
+@Service
 @Slf4j
 public class UpdateService {
 
@@ -24,7 +25,7 @@ public class UpdateService {
                 builder.append(",");
             }
         }
-        log.info(builder.toString());
+        //log.info(builder.toString());
 
         return builder;
     }

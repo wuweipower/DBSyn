@@ -32,7 +32,11 @@ public class BinlogToSql implements ApplicationRunner {
     @Value("${mysql.password}")
     private String password;
 
+    @Autowired
     private Map<Long,String>tableMap;
+
+    @Autowired
+    private Map<String,List<String>> colMap;
 
     @Autowired
     private SendSqlService sendSqlService;
@@ -45,6 +49,9 @@ public class BinlogToSql implements ApplicationRunner {
 
     @Autowired
     private DeleteService deleteService;
+
+    @Autowired
+    private ColumnsService columnsService;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
@@ -65,15 +72,15 @@ public class BinlogToSql implements ApplicationRunner {
         client.registerEventListener(event -> {
             EventData data = event.getData();
             StringBuilder sql = null;//存储要发送的sql
-
             //存tableId和对应的名字
             if(data instanceof TableMapEventData)
             {
                 TableMapEventData tableMapEventData = (TableMapEventData) data;
-                log.info(tableMapEventData.toString());
+                //log.info(tableMapEventData.toString());
                 Long tableID = tableMapEventData.getTableId();
                 String tableName = tableMapEventData.getTable();
                 tableMap.put(tableID,tableName);
+                log.info(columnsService.getColumnNames(tableMapEventData.getDatabase(),tableMapEventData.getTable()).toString());
             }
             /**
              * 分别对insert update delete进行sql转化
@@ -82,13 +89,15 @@ public class BinlogToSql implements ApplicationRunner {
             if (data instanceof WriteRowsEventData)
             {
                 WriteRowsEventData eventData = (WriteRowsEventData) data;
-
+                QueryEventData queryEventData = (QueryEventData) data;
+                log.info(queryEventData.toString());
                 String table = tableMap.get(eventData.getTableId());
-
-//                for(Object[] row : eventData.getRows())
-//                {
-//                    sql= insertService.insertHandler(table, row);
-//                }
+                log.info(eventData.getRows().toString());
+                for(Object[] row : eventData.getRows())
+                {
+                    sql= insertService.insertHandler(table, row);
+                    log.info(sql.toString());
+                }
             }
             else if(data instanceof UpdateRowsEventData)
             {
@@ -97,23 +106,24 @@ public class BinlogToSql implements ApplicationRunner {
                 BitSet includedColumns = eventData.getIncludedColumns();
                 BitSet includedColumnsBeforeUpdate = eventData.getIncludedColumnsBeforeUpdate();
                 List<Map.Entry<Serializable[], Serializable[]>> rows = eventData.getRows();
-//                for(Map.Entry<Serializable[], Serializable[]> row : rows )
-//                {
-//                    sql= updateService.updateHandler(table, row);
-//                }
+                for(Map.Entry<Serializable[], Serializable[]> row : rows )
+                {
+                    sql= updateService.updateHandler(table, row);
+                    log.info(sql.toString());
+                }
             }
             else if (data instanceof DeleteRowsEventData) {
                 DeleteRowsEventData eventData = (DeleteRowsEventData) data;
                 String table = tableMap.get(eventData.getTableId());
 
                 List<Serializable[]> rows = eventData.getRows();
-//                for (Serializable[] row:rows) {
-//
-//                }
+                for (Serializable[] row:rows) {
+
+                }
             }
 
             //最后发送出去
-            sendSqlService.sendSql(sql.toString());
+            //sendSqlService.sendSql(sql.toString());
         });
         try {
             client.connect();

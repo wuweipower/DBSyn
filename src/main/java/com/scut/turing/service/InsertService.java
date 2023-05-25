@@ -1,8 +1,10 @@
 package com.scut.turing.service;
 
+import org.springframework.stereotype.Service;
+
 import java.io.Serializable;
 import java.sql.Timestamp;
-
+@Service
 public class InsertService {
     public  String dataConvert(Object value)
     {
