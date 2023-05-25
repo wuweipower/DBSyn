@@ -8,7 +8,7 @@ import java.util.List;
 @Service
 public class DeleteService {
 
-    public static String deleteHandler(String tableName, Serializable[] before, Serializable[] after, List<String> cols){
+    public StringBuilder deleteHandler(String tableName, Serializable[] before, List<String> cols){
 
         StringBuilder builder = new StringBuilder();
         builder.append("delete from ");
@@ -31,7 +31,7 @@ public class DeleteService {
 
         }
 
-        return builder.toString();
+        return builder;
 
     }
 }

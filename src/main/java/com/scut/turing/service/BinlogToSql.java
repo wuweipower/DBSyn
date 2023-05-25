@@ -110,20 +110,22 @@ public class BinlogToSql implements ApplicationRunner {
                 BitSet includedColumns = eventData.getIncludedColumns();
                 BitSet includedColumnsBeforeUpdate = eventData.getIncludedColumnsBeforeUpdate();
                 List<Map.Entry<Serializable[], Serializable[]>> rows = eventData.getRows();
-
+                List<String> columnNames = columnsService.getColumnNames("",table);
                 for(Map.Entry<Serializable[], Serializable[]> row : rows )
                 {
-                    //sql= updateService.updateHandler(table, row);
+                    sql = updateService.updateHandler(table,row,columnNames);
                     log.info(sql.toString());
                 }
             }
             else if (data instanceof DeleteRowsEventData) {
                 DeleteRowsEventData eventData = (DeleteRowsEventData) data;
                 String table = tableMap.get(eventData.getTableId());
-
+                List<String> columnNames = columnsService.getColumnNames("",table);
                 List<Serializable[]> rows = eventData.getRows();
-                for (Serializable[] row:rows) {
-
+                for (Serializable[] row:rows)
+                {
+                    sql = deleteService.deleteHandler(table,row,columnNames);
+                    log.info(sql.toString());
                 }
             }
 
