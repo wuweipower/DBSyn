@@ -15,9 +15,9 @@ public class ColumnsService {
     private ColumnMetadataRepository columnMetadataRepository;
 
     public List<String> getColumnNames(String databaseName, String tableName) {
-        List<ColumnMetadata> columns = columnMetadataRepository.findByTableSchemaAndTableName(databaseName, tableName);
+
         // 或者
         // List<ColumnMetadata> columns = columnMetadataRepository.findByTableSchemaAndTableNameOrderByOrdinalPosition(databaseName, tableName);
-        return columns.stream().map(ColumnMetadata::getColumnName).collect(Collectors.toList());
+        return columnMetadataRepository.findAllCols(tableName);
     }
 }

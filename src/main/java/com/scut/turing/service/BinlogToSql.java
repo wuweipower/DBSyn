@@ -3,7 +3,10 @@ package com.scut.turing.service;
 import com.github.shyiko.mysql.binlog.BinaryLogClient;
 import com.github.shyiko.mysql.binlog.event.*;
 
+import com.github.shyiko.mysql.binlog.event.deserialization.EventDeserializer;
+import com.github.shyiko.mysql.binlog.event.deserialization.UpdateRowsEventDataDeserializer;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.tool.schema.extract.spi.ColumnTypeInformation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
@@ -103,12 +106,14 @@ public class BinlogToSql implements ApplicationRunner {
             {
                 UpdateRowsEventData eventData = (UpdateRowsEventData) data;
                 String table = tableMap.get(eventData.getTableId());
+
                 BitSet includedColumns = eventData.getIncludedColumns();
                 BitSet includedColumnsBeforeUpdate = eventData.getIncludedColumnsBeforeUpdate();
                 List<Map.Entry<Serializable[], Serializable[]>> rows = eventData.getRows();
+
                 for(Map.Entry<Serializable[], Serializable[]> row : rows )
                 {
-                    sql= updateService.updateHandler(table, row);
+                    //sql= updateService.updateHandler(table, row);
                     log.info(sql.toString());
                 }
             }
