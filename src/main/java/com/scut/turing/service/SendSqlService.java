@@ -21,7 +21,8 @@ public class SendSqlService {
     {
         //System.out.println("sql to be send: "+sql);
         log.info("In method "+ Method.class+"  "+sql);
-        rabbitTemplate.convertAndSend(exchangeName,routeKey,sql);
+        //rabbitTemplate.convertAndSend(exchangeName,routeKey,sql);
+        rabbitTemplate.convertAndSend("sql_exchange","sql",sql);
     }
 
 }

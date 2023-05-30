@@ -1,6 +1,7 @@
 package com.scut.turing.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
@@ -10,6 +11,8 @@ import java.util.Map;
 @Slf4j
 public class UpdateService {
 
+    @Autowired
+    InsertService insertService;
     public  StringBuilder updateHandler(String tableName, Map.Entry<Serializable[], Serializable[]> row, List<String> cols){
         StringBuilder builder = new StringBuilder();
         builder.append("update ");
@@ -30,8 +33,9 @@ public class UpdateService {
         Serializable[] after = row.getValue();
         for(int i=0;i<after.length;i++)
         {
-            builder.append(cols.get(i).toString() + " = "+after[i]);
-            if(i!=after.length)
+            //builder.append(cols.get(i).toString() + " = "+after[i]);
+            builder.append(cols.get(i).toString() + " = "+insertService.dataConvert(after[i]));
+            if(i!=after.length-1)
             {
                 builder.append(",");
             }
@@ -41,15 +45,18 @@ public class UpdateService {
         {
             if(i==1)
             {
-                builder.append(cols.get(i).toString()+" = "+before[i]);
+                builder.append(cols.get(i).toString()+" = "+insertService.dataConvert(before[i]));
+                //builder.append(insertService.dataConvert(cols.get(i))+" = "+before[i]);
             }
             else
             {
-                builder.append(cols.get(i).toString()+" = "+before[i]+" and ");
+                //builder.append(cols.get(i).toString()+" = "+before[i]);
+                builder.append(cols.get(i).toString()+" = "+insertService.dataConvert(before[i]));
+                //builder.append(insertService.dataConvert(cols.get(i))+" = "+before[i]);
             }
-            if(i!= before.length)
+            if(i!= before.length-1)
             {
-                builder.append(",");
+                builder.append(" and ");
             }
 
         }
