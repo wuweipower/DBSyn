@@ -101,7 +101,7 @@ public class BinlogToSql implements ApplicationRunner {
                 {
                     sql= insertService.insertHandler(table, row);
                     log.info(sql.toString());
-                    sendSqlService.sendSql("sql.toString()");
+                    sendSqlService.sendSql(sql.toString());
                 }
             }
             else if(data instanceof UpdateRowsEventData)
@@ -131,6 +131,18 @@ public class BinlogToSql implements ApplicationRunner {
                     log.info(sql.toString());
                     sendSqlService.sendSql(sql.toString());
                 }
+            }
+            else if (data instanceof QueryEventData)
+            {
+                QueryEventData queryEventData = (QueryEventData) data;
+                String str = queryEventData.getSql();
+                //System.out.println(str);
+                if(!str.equals("BEGIN"))
+                {
+                    log.info(str);
+                    sendSqlService.sendSql(str);
+                }
+
             }
 
             //最后发送出去
