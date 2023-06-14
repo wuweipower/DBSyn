@@ -20,9 +20,17 @@ public class SendSqlService {
     public void sendSql(String sql)
     {
         //System.out.println("sql to be send: "+sql);
-        log.info("In method "+ Method.class+"  "+sql);
+        //log.info("In method "+ Method.class+"  "+sql);
         //rabbitTemplate.convertAndSend(exchangeName,routeKey,sql);
         rabbitTemplate.convertAndSend("sql_exchange","sql",sql);
+    }
+
+    public void sendSqlBatch(String sql,String routeKey)
+    {
+        //System.out.println("sql to be send: "+sql);
+        //log.info("In method "+ Method.class+"  "+sql);
+        //rabbitTemplate.convertAndSend(exchangeName,routeKey,sql);
+        rabbitTemplate.convertAndSend("sql_exchange",routeKey,sql);
     }
 
 }

@@ -33,7 +33,7 @@ public class DeleteService {
             }
 
         }
-
+        builder.append(";");
         return builder;
 
     }

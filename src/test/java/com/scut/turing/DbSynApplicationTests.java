@@ -2,11 +2,15 @@ package com.scut.turing;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
+import com.scut.turing.service.SendSqlService;
 import com.scut.turing.service.UpdateService;
 import org.junit.jupiter.api.Test;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @SpringBootTest
 class DbSynApplicationTests {
@@ -28,8 +32,8 @@ class DbSynApplicationTests {
 		connectionFactory.setHost("127.0.0.1");
 		connectionFactory.setPort(5672);
 		connectionFactory.setVirtualHost("/");
-		connectionFactory.setUsername("admin");
-		connectionFactory.setPassword("admin");
+		connectionFactory.setUsername("Lanny");
+		connectionFactory.setPassword("Lanny");
 		Connection connection = null;
 		Channel channel = null;
 		try {
@@ -77,6 +81,94 @@ class DbSynApplicationTests {
 					ex.printStackTrace();
 				}
 			}
+		}
+	}
+
+	@Autowired
+	SendSqlService sendSqlService;
+	@Test
+	void testSpeed()
+	{
+		for(int i= 50000;i<60000;++i){
+			String sql = "insert into t3 values( "+ String.valueOf(i) + ", \'"+"n"+String.valueOf(i)+"\', "+"\'i"+
+					String.valueOf(i)+"\');";
+			sendSqlService.sendSql(sql);
+		}
+	}
+
+	@Test
+	void testSqlProcess()
+	{
+		String str="create table t4(id int unsigned not null,sid int unique auto_increment,primary key(id));";
+		if (!str.equals("BEGIN")) {
+			str = str.toLowerCase();
+			str = str.replaceAll("datetime", "date");
+			str = str.replaceAll("tinyint", "smallint");
+			str = str.replaceAll("blob", "bytea");
+			str = str.replace('`', ' ');
+			String pattern = "auto_increment";
+			Pattern p = Pattern.compile(pattern);
+			Matcher m = p.matcher(str);
+			if (m.find())
+			{
+				String[] result = str.split(",");
+				for(int i=0;i< result.length;i++)
+				{
+					System.out.println(result[i]);
+					pattern = "auto_increment";
+					p = Pattern.compile(pattern);
+					m = p.matcher(result[i]);
+					if(m.find())
+					{
+						result[i]=result[i].replaceAll("int","serial");
+						result[i]=result[i].replaceAll("unsigned","");
+						result[i] = result[i].replaceAll("auto_increment", "");
+					}
+					pattern = "unsigned";
+					p = Pattern.compile(pattern);
+					m = p.matcher(result[i]);
+					if(m.find())
+					{
+						result[i]=result[i].replaceAll("int","");
+						result[i]=result[i].replaceAll("unsigned","bigint");
+					}
+					System.out.println(result[i]);
+				}
+				String newString="";
+				for(int i=0;i< result.length;i++)
+				{
+					newString+=result[i];
+					if(i!=result.length-1)
+						newString+=",";
+				}
+				str=newString;
+			}
+			pattern = "unsigned";
+			p = Pattern.compile(pattern);
+			m = p.matcher(str);
+			if(m.find())
+			{
+				str=str.replaceAll("unsigned","bigint");
+				str=str.replaceAll("int","");
+			}
+			System.out.println(str);
+		}
+	}
+
+	@Test
+	void TestMultiQueue()
+	{
+		for(int i=0;i<30000;i=i+3)
+		{
+			String sql = "insert into t3 values( "+ String.valueOf(i) + ", \'"+"n"+String.valueOf(i)+"\', "+"\'i"+
+					String.valueOf(i)+"\');";
+			sendSqlService.sendSqlBatch(sql,"batch_1");
+			sql = "insert into t3 values( "+ String.valueOf(i+1) + ", \'"+"n"+String.valueOf(i+1)+"\', "+"\'i"+
+					String.valueOf(i+1)+"\');";
+			sendSqlService.sendSqlBatch(sql,"batch_2");
+			sql = "insert into t3 values( "+ String.valueOf(i+2) + ", \'"+"n"+String.valueOf(i+2)+"\', "+"\'i"+
+					String.valueOf(i+2)+"\');";
+			sendSqlService.sendSqlBatch(sql,"batch_3");
 		}
 	}
 

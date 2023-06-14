@@ -60,6 +60,7 @@ public class UpdateService {
             }
 
         }
+        builder.append(";");
         //log.info(builder.toString());
         return builder;
     }

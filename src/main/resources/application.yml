@@ -2,19 +2,19 @@ mysql:
   host: localhost
   port: 3306
   username: root
-  password: 123456
+  password: renxuehui
 
 spring:
   rabbitmq:
-    username: admin
-    password: admin
+    username: Lanny
+    password: Lanny
     virtual-host: /
     host: 127.0.0.1
     port: 5672
   datasource:
     username: root
-    password: 123456
-    url: jdbc:mysql://localhost:3306/se?serverTimezone=Asia/Shanghai
+    password: renxuehui
+    url: jdbc:mysql://localhost:3306/se?serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
     driver-class-name: com.mysql.cj.jdbc.Driver
 
 server:

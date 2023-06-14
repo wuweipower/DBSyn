@@ -19,6 +19,8 @@ import java.util.BitSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Component
 @Slf4j
@@ -101,7 +103,7 @@ public class BinlogToSql implements ApplicationRunner {
                 {
                     sql= insertService.insertHandler(table, row);
                     log.info(sql.toString());
-                    sendSqlService.sendSql("sql.toString()");
+                    sendSqlService.sendSql(sql.toString());
                 }
             }
             else if(data instanceof UpdateRowsEventData)
@@ -132,10 +134,69 @@ public class BinlogToSql implements ApplicationRunner {
                     sendSqlService.sendSql(sql.toString());
                 }
             }
-
+            else if(data instanceof QueryEventData) {
+                QueryEventData queryEventData = (QueryEventData) data;
+                String str = queryEventData.getSql();
+                System.out.println(str);
+                if (!str.equals("BEGIN")) {
+                    str = str.toLowerCase();
+                    str = str.replaceAll("datetime", "date");
+                    str = str.replaceAll("tinyint", "smallint");
+                    str = str.replaceAll("blob", "bytea");
+                    str = str.replace('`', ' ');
+                    if (isFind(str,"auto_increment"))
+                    {
+                        String[] result = str.split(",");
+                        for(int i=0;i< result.length;i++)
+                        {
+                            if (isFind(result[i],"auto_increment"))
+                            {
+                                result[i]=result[i].replaceAll("int","serial");
+                                result[i]=result[i].replaceAll("unsigned","");
+                                result[i] = result[i].replaceAll("auto_increment", "");
+                            }
+                            if (isFind(result[i],"unsigned"))
+                            {
+                                result[i]=result[i].replaceAll("int","");
+                                result[i]=result[i].replaceAll("unsigned","bigint");
+                            }
+                        }
+                        String newString="";
+                        for(int i=0;i< result.length;i++)
+                        {
+                            newString+=result[i];
+                            if(i!=result.length-1)
+                                newString+=",";
+                        }
+                        str=newString;
+                    }
+                    if (isFind(str,"unsigned"))
+                    {
+                        String[] result = str.split(",");
+                        for(int i=0;i< result.length;i++)
+                        {
+                            if (isFind(result[i],"unsigned"))
+                            {
+                                result[i]=result[i].replaceAll("int","");
+                                result[i]=result[i].replaceAll("unsigned","bigint");
+                            }
+                        }
+                        String newString="";
+                        for(int i=0;i< result.length;i++)
+                        {
+                            newString+=result[i];
+                            if(i!=result.length-1)
+                                newString+=",";
+                        }
+                        str=newString;
+                    }
+                    str+=";";
+                    System.out.println(str);
+                    sendSqlService.sendSql(str);
+                }
+            }
             //最后发送出去
             //log.info("sql: ",sql.toString());
-
         });
         try {
             client.connect();
@@ -145,5 +206,11 @@ public class BinlogToSql implements ApplicationRunner {
             e.printStackTrace();
         }
     }
-
+    Boolean isFind(String str,String matchStr)
+    {
+        String pattern = matchStr;
+        Pattern p = Pattern.compile(pattern);
+        Matcher m = p.matcher(str);
+        return m.find();
+    }
 }
