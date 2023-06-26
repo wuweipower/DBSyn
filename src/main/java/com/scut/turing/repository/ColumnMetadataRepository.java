@@ -12,8 +12,9 @@ public interface ColumnMetadataRepository extends JpaRepository<ColumnMetadata,L
     //    List<ColumnMetadata> findByTableSchemaAndTableName(String tableSchema, String tableName);
 //
 //    List<ColumnMetadata> findByTableSchemaAndTableNameOrderByOrdinalPosition(String tableSchema, String tableName);
-    @Query(value = "SELECT COLUMN_NAME FROM information_schema.COLUMNS WHERE TABLE_NAME = ?1 ORDER BY ORDINAL_POSITION",nativeQuery = true)
-    //@Query(value = "SELECT COLUMN_NAME FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = se AND TABLE_NAME = ?1 ORDER BY ORDINAL_POSITION",nativeQuery = true)
+    @Query(value =
+            "SELECT COLUMN_NAME FROM information_schema.COLUMNS WHERE TABLE_NAME = ?1 ORDER BY ORDINAL_POSITION",
+            nativeQuery = true)
     List<String> findAllCols(String table);
 
 }
